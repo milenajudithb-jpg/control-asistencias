@@ -484,6 +484,64 @@ fieldset.fl legend{padding:0;margin-bottom:6px}
 .dlg-f{display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end;align-items:center}
 .dlg-f .spacer{flex:1}
 
+/* ---------- Repuestos del vale ---------- */
+.card-rep{margin-top:16px}
+.rep-tiles{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}
+.rep-tile{min-width:0;padding:12px 14px;border-radius:12px;background:var(--panel-2);border:1px solid var(--line)}
+.rep-tile b{display:block;font:600 26px/1.1 var(--font-body);font-variant-numeric:tabular-nums}
+.rep-tile span{display:block;margin-top:4px;font-size:12.5px;line-height:1.3;color:var(--ink-2)}
+.rep-tile.st-bad{background:var(--bad-soft);border-color:color-mix(in srgb, var(--bad) 35%, transparent)}
+.rep-tile.st-bad b{color:var(--bad-ink)}
+.rep-tile.st-ok b{color:var(--ok-ink)}
+.rep-cols{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:20px;margin-top:18px}
+.rep-col{min-width:0}
+.rep-h{margin:0 0 8px;font-size:12px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.rep-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.rep-item{display:grid;grid-template-columns:52px minmax(0,1fr);gap:12px;align-items:center;width:100%;padding:8px 12px;border:1px solid var(--line);border-radius:12px;background:var(--panel);text-align:left}
+.rep-item:hover{border-color:var(--accent-line)}
+.rep-item .r-date{padding:6px 0}
+.rep-chips{display:flex;flex-wrap:wrap;gap:6px}
+.rep-f{background:var(--bad)}
+.chip-dif{display:inline-flex;align-items:center;gap:5px;padding:3px 9px 3px 7px;border-radius:999px;background:var(--c-soft);color:var(--ink);font-size:12.5px;font-weight:700;white-space:nowrap}
+.chip-dif .ic{width:14px;height:14px;color:var(--c-ink);stroke-width:2.6}
+.tag.tag-bad{background:var(--bad-soft);color:var(--bad-ink)}
+.tag.tag-warn{background:var(--warn-soft);color:var(--warn-ink)}
+.tag.tag-ok{background:var(--ok-soft);color:var(--ok-ink)}
+.pz-cards{display:flex;flex-direction:column;gap:8px}
+.pz-card{padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--panel)}
+.pz-top{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 10px}
+.pz-name{font-weight:700}
+.pz-meta{font:500 12px/1.3 var(--font-mono);color:var(--muted)}
+.pz-nums{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin-top:10px}
+.pz-n{min-width:0;padding:6px 8px;border-radius:8px;background:var(--panel-2)}
+.pz-n b{display:block;font-size:16px;font-variant-numeric:tabular-nums}
+.pz-n span{display:block;font-size:11px;line-height:1.25;color:var(--muted)}
+.pz-n.pz-cons b{font-size:13px;line-height:1.5}
+.pz-sum{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.pz-form{display:flex;flex-direction:column;gap:10px}
+.pz-row{display:grid;gap:10px;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--panel-2)}
+.pz-row .g3{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1fr);gap:8px}
+.pz-row .g-num{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.pz-row .g-vieja{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.pz-row label{display:flex;flex-direction:column;justify-content:flex-end;gap:4px;min-width:0;font-size:12px;font-weight:700;color:var(--ink-2)}
+.pz-row input[type=text],.pz-row input[type=number]{width:100%;min-height:42px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:0 10px;font-size:16px;font-weight:500}
+.pz-row input:disabled{opacity:.45}
+.pz-row input:focus{border-color:var(--accent);outline:2px solid var(--accent-soft);outline-offset:0}
+.pz-row .pz-check{grid-column:1/-1;flex-direction:row;align-items:center;justify-content:flex-start;gap:8px;font-size:13px;font-weight:600}
+.pz-row .pz-check input{width:18px;height:18px;flex:none;accent-color:var(--accent)}
+.pz-row .pz-sum{margin-top:0}
+.pz-foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px}
+.pz-quitar{display:inline-flex;align-items:center;gap:5px;color:var(--bad-ink)}
+.pz-quitar .ic{width:15px;height:15px}
+@media (max-width:1100px){.rep-tiles{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:640px){
+  .rep-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .rep-cols{grid-template-columns:minmax(0,1fr)}
+  .pz-nums{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .pz-row .g3{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .pz-row .g3 label:first-child{grid-column:1/-1}
+}
+
 </style>
 </head>
 <body>
@@ -669,6 +727,16 @@ fieldset.fl legend{padding:0;margin-bottom:6px}
     <div class="chart" id="chart-dias"></div>
   </article>
 
+  <article class="card card-rep" id="card-rep" aria-labelledby="rep-titulo">
+    <div class="card-h">
+      <div>
+        <h2 id="rep-titulo">Repuestos del vale</h2>
+        <p class="card-sub" id="rep-sub">Lo que salió de bodega comparado con lo que se instaló, lo que regresó sin usar y las piezas viejas entregadas.</p>
+      </div>
+    </div>
+    <div id="rep-cuerpo"></div>
+  </article>
+
   <section class="card registro" id="registro" aria-labelledby="reg-titulo">
     <div class="card-h">
       <div>
@@ -761,6 +829,65 @@ const MES_L = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', '
 const DIA = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
 const CAMPOS = ['fecha', 'hora', 'unidad', 'destino', 'mec1', 'mec2', 'area', 'falla', 'estado', 'vale', 'envio', 'comentario', 'repuestos'];
 const vacioConteo = () => ({ retorno: 0, pendiente: 0, sin_retorno: 0, no_aplica: 0, sin_validar: 0 });
+
+/* ================= Repuestos del vale ================= */
+/* Cada línea: repuesto, código, vale y cantidades. Diferencia del vale = salió − instaló − regresó sin usar.
+   Piezas viejas pendientes = instaló − pieza vieja entregada (los consumibles no llevan pieza vieja). */
+const PZ_NUM = ['salio', 'instalo', 'regreso', 'retirada', 'entregada'];
+const redondea = x => Math.round(x * 1000) / 1000;
+const cero = v => (v === '' || v == null ? 0 : v);
+const txtPz = v => String(v == null ? '' : v).replace(/\s+/g, ' ').trim().slice(0, 120);
+function numPz(v) {
+  if (v === '' || v == null) return '';
+  const x = Number(String(v).trim().replace(',', '.'));
+  return isFinite(x) && x >= 0 ? redondea(x) : '';
+}
+function limpiaPiezas(v) {
+  let arr = v;
+  if (typeof v === 'string') { try { arr = v.trim() ? JSON.parse(v) : []; } catch (e) { arr = []; } }
+  if (!Array.isArray(arr)) return [];
+  return arr.map(p => {
+    p = p || {};
+    const o = { repuesto: txtPz(p.repuesto), codigo: txtPz(p.codigo), vale: txtPz(p.vale) };
+    for (const k of PZ_NUM) o[k] = numPz(p[k]);
+    o.consumible = p.consumible === true || /^(s[ií]|true|1)$/i.test(String(p.consumible == null ? '' : p.consumible).trim());
+    if (o.consumible) { o.retirada = ''; o.entregada = ''; }
+    return o;
+  }).filter(o => o.repuesto || o.codigo || PZ_NUM.some(k => o[k] !== ''));
+}
+function lineaPz(p) {
+  return { dif: redondea(cero(p.salio) - cero(p.instalo) - cero(p.regreso)), pend: p.consumible ? 0 : redondea(cero(p.instalo) - cero(p.entregada)) };
+}
+function resumenPiezas(lista) {
+  const t = { lineas: 0, salio: 0, instalo: 0, regreso: 0, retirada: 0, entregada: 0, esperadas: 0, faltaVale: 0, sobraVale: 0, faltaViejas: 0, sobraViejas: 0, conDif: 0 };
+  for (const p of lista || []) {
+    t.lineas++;
+    for (const k of PZ_NUM) t[k] += cero(p[k]);
+    if (!p.consumible) t.esperadas += cero(p.instalo);
+    const { dif, pend } = lineaPz(p);
+    if (dif > 0) t.faltaVale += dif; else if (dif < 0) t.sobraVale -= dif;
+    if (pend > 0) t.faltaViejas += pend; else if (pend < 0) t.sobraViejas -= pend;
+    if (dif || pend) t.conDif++;
+  }
+  for (const k in t) t[k] = redondea(t[k]);
+  return t;
+}
+const resumenLinea = p => resumenPiezas([p]);
+const fmtN = x => new Intl.NumberFormat('es-GT', { maximumFractionDigits: 3 }).format(x);
+function partesPz(t) {
+  const out = [];
+  if (t.faltaVale > 0) out.push({ cls: 'st-bad', icon: 'i-bad', txt: t.faltaVale === 1 ? 'Falta 1 del vale' : 'Faltan ' + fmtN(t.faltaVale) + ' del vale' });
+  if (t.faltaViejas > 0) out.push({ cls: 'st-bad', icon: 'i-bad', txt: t.faltaViejas === 1 ? 'Falta 1 pieza vieja' : 'Faltan ' + fmtN(t.faltaViejas) + ' piezas viejas' });
+  if (t.sobraVale > 0) out.push({ cls: 'st-warn', icon: 'i-alert', txt: 'Revisar: ' + fmtN(t.sobraVale) + ' de más contra el vale' });
+  if (t.sobraViejas > 0) out.push({ cls: 'st-warn', icon: 'i-alert', txt: 'Revisar: ' + fmtN(t.sobraViejas) + (t.sobraViejas === 1 ? ' pieza vieja' : ' piezas viejas') + ' de más' });
+  return out;
+}
+function chipsPz(t, conCuadra) {
+  const ps = partesPz(t);
+  if (!ps.length && conCuadra !== false) ps.push({ cls: 'st-ok', icon: 'i-ok', txt: 'Cuadra' });
+  return ps.map(p => h('span', { class: 'chip-dif ' + p.cls }, ic(p.icon), p.txt));
+}
+const textoPz = t => partesPz(t).map(p => p.txt).join(' · ') || 'Cuadra';
 
 /* ================= Utilidades ================= */
 const $ = (s, r) => (r || document).querySelector(s);
@@ -988,6 +1115,7 @@ function limpia(r) {
   if (!EST[o.estado]) o.estado = 'sin_validar';
   if (!/^\d{4}-\d{2}-\d{2}$/.test(o.fecha)) o.fecha = '';
   if (o.hora && !/^\d{2}:\d{2}$/.test(o.hora)) o.hora = '';
+  o.piezas = limpiaPiezas(r.piezas);
   if (r.creado) o.creado = String(r.creado);
   if (r.editado) o.editado = String(r.editado);
   return o;
@@ -995,6 +1123,7 @@ function limpia(r) {
 function plano(r) {
   const o = { id: r.id };
   for (const k of CAMPOS) o[k] = r[k] || '';
+  o.piezas = (r.piezas || []).map(p => Object.assign({}, p));
   if (r.creado) o.creado = r.creado;
   if (r.editado) o.editado = r.editado;
   return o;
@@ -1076,7 +1205,7 @@ function reconstruir() {
   const arr = [...map.values()].filter(r => r.fecha && r.unidad);
   arr.sort((a, b) => (b.fecha + (b.hora || '')).localeCompare(a.fecha + (a.hora || '')) || b.id.localeCompare(a.id));
   REG = registroMecanicos(arr);
-  for (const r of arr) { r._p = participantes(r); r._u = unidadInfo(r.unidad); }
+  for (const r of arr) { r._p = participantes(r); r._u = unidadInfo(r.unidad); r._pz = resumenPiezas(r.piezas); }
   S.records = arr;
   S.porId = new Map(arr.map(r => [r.id, r]));
   reconstruirFotos();
@@ -1118,6 +1247,7 @@ function imagenConRespaldo(img, f, mini) {
   img.src = srcFoto(f, mini);
 }
 function mismoRegistro(a, b) {
+  if (JSON.stringify(a.piezas || []) !== JSON.stringify(b.piezas || [])) return false;
   for (const k of CAMPOS) { if (k === 'mec1' || k === 'mec2') continue; if ((a[k] || '') !== (b[k] || '')) return false; }
   const ps = x => [x.mec1, x.mec2].map(m => REG.clave(m)).filter(Boolean).sort().join('+');
   return ps(a) === ps(b);
@@ -1138,7 +1268,7 @@ async function reconciliar() {
 
 /* ================= Filtros y agregados ================= */
 function textoBusqueda(r) {
-  if (!r._q) r._q = skey([r.unidad, r.destino, r.falla, r.comentario, r.vale, r.envio, r.repuestos, r.area, EST[r.estado].label].concat(r._p.map(p => REG.nombre(p.k))).join(' '));
+  if (!r._q) r._q = skey([r.unidad, r.destino, r.falla, r.comentario, r.vale, r.envio, r.repuestos, r.area, EST[r.estado].label].concat(r._p.map(p => REG.nombre(p.k)), (r.piezas || []).map(p => p.repuesto + ' ' + p.codigo + ' ' + p.vale)).join(' '));
   return r._q;
 }
 function filtrar(opts) {
@@ -1260,6 +1390,7 @@ function renderFiltros() {
   lista('dl-mecanicos', mecs.map(m => m.n));
   lista('dl-unidades', [...new Set(S.records.map(r => r.unidad))].sort((a, b) => a.localeCompare(b, 'es')));
   lista('dl-destinos', [...new Set(S.records.map(r => lugar(r.destino)).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'es')));
+  lista('dl-repuestos', [...new Set(S.records.flatMap(r => (r.piezas || []).map(p => p.repuesto)).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'es')));
 }
 function setFiltro(p) {
   Object.assign(S.filt, p);
@@ -1275,6 +1406,7 @@ function renderTodo() {
   renderAreas(recs);
   renderUnidades(recs);
   renderDias(recs);
+  renderRepuestos(recs);
   renderRegistro(recs);
   const f = S.filt;
   $('#f-limpiar').hidden = !(f.periodo !== 'todo' || f.mec || f.area || f.estado || f.q);
@@ -1609,11 +1741,81 @@ function filaRegistro(r) {
         h('span', { class: 'r-top' }, uchip(r._u), r.destino ? h('span', { class: 'r-dest' }, ic('i-pin'), lugar(r.destino)) : null),
         h('span', { class: 'r-falla' + (r.falla ? '' : ' vacia'), text: r.falla ? suave(r.falla) : 'Sin detalle de la falla' }),
         r._p.length ? h('span', { class: 'r-mecs' }, r._p.map((p, i) => h('span', null, ic(i ? 'i-users' : 'i-user'), REG.nombre(p.k)))) : null),
-      h('span', { class: 'r-side' }, chipEstado(r.estado), vale ? h('span', { class: 'r-vale', text: vale }) : null,
+      h('span', { class: 'r-side' }, chipEstado(r.estado), vale ? h('span', { class: 'r-vale', text: vale }) : null, etiquetaPz(r._pz),
         r.origen !== 'base' ? h('span', { class: 'tag', title: 'Guardada en este equipo; se sube sola a la hoja de Google', text: 'Sin subir' }) : null)),
     h('div', { class: 'r-actions' },
       h('button', { type: 'button', class: 'btn-foto', 'data-act': 'fotos', 'aria-label': n ? 'Fotos de esta asistencia (' + n + ')' : 'Agregar fotos a esta asistencia' }, ic('i-camera'), n ? h('span', { class: 'n', text: n }) : 'Fotos'),
       h('button', { type: 'button', class: 'btn-icon', 'data-act': 'editar', 'aria-label': 'Editar asistencia' }, ic('i-edit'))));
+}
+function etiquetaPz(t) {
+  if (!t || !t.lineas) return null;
+  const falta = redondea(t.faltaVale + t.faltaViejas);
+  if (falta > 0) return h('span', { class: 'tag tag-bad', title: textoPz(t), text: 'Repuestos: ' + (falta === 1 ? 'falta 1' : 'faltan ' + fmtN(falta)) });
+  if (t.sobraVale || t.sobraViejas) return h('span', { class: 'tag tag-warn', title: textoPz(t), text: 'Repuestos: revisar' });
+  return h('span', { class: 'tag tag-ok', title: 'Lo que salió del vale cuadra y las piezas viejas se entregaron', text: 'Repuestos: cuadra' });
+}
+function renderRepuestos(recs) {
+  const cont = $('#rep-cuerpo');
+  cont.textContent = '';
+  const conPz = recs.filter(r => r._pz && r._pz.lineas);
+  $('#rep-sub').textContent = conPz.length
+    ? conPz.length + ' de ' + recs.length + ' ' + plural(recs.length, 'asistencia') + ' tienen repuestos registrados. Lo que salió de bodega comparado con lo que se instaló, lo que regresó sin usar y las piezas viejas entregadas.'
+    : 'Lo que salió de bodega comparado con lo que se instaló, lo que regresó sin usar y las piezas viejas entregadas.';
+  if (!conPz.length) {
+    cont.append(vacio('i-box', recs.length ? 'Todavía no hay repuestos registrados en estas asistencias. Abre una asistencia y toca “Agregar repuestos”.' : 'Sin asistencias con estos filtros.'));
+    return;
+  }
+  const t = resumenPiezas(conPz.flatMap(r => r.piezas));
+  const tile = (v, label, cls) => h('div', { class: 'rep-tile' + (cls ? ' ' + cls : '') }, h('b', { text: fmtN(v) }), h('span', { text: label }));
+  cont.append(h('div', { class: 'rep-tiles' },
+    tile(t.salio, 'salieron de bodega'),
+    tile(t.instalo, 'se instalaron'),
+    tile(t.regreso, 'regresaron sin usar'),
+    tile(t.faltaVale, t.faltaVale === 1 ? 'falta del vale' : 'faltan del vale', t.faltaVale ? 'st-bad' : 'st-ok'),
+    tile(t.entregada, 'piezas viejas entregadas de ' + fmtN(t.esperadas)),
+    tile(t.faltaViejas, t.faltaViejas === 1 ? 'pieza vieja pendiente' : 'piezas viejas pendientes', t.faltaViejas ? 'st-bad' : 'st-ok')));
+
+  const conDif = conPz.filter(r => r._pz.conDif).sort((a, b) => (b._pz.faltaVale + b._pz.faltaViejas) - (a._pz.faltaVale + a._pz.faltaViejas) || (b.fecha + b.hora).localeCompare(a.fecha + a.hora));
+  const izq = h('div', { class: 'rep-col' }, h('p', { class: 'rep-h', text: conDif.length ? conDif.length + ' ' + plural(conDif.length, 'asistencia') + ' con diferencias' : 'Diferencias' }));
+  if (!conDif.length) izq.append(h('p', { class: 'note', text: 'Todo cuadra: lo que salió se instaló o regresó, y las piezas viejas se entregaron.' }));
+  else {
+    const ul = h('ul', { class: 'rep-list' });
+    for (const r of conDif.slice(0, 8)) {
+      const { d, m } = partes(r.fecha);
+      ul.append(h('li', null, h('button', { type: 'button', class: 'rep-item', 'data-id': r.id, 'aria-label': 'Ver repuestos: ' + r._u.tipo + ' ' + r._u.cod + ', ' + fechaLarga(r.fecha) + '. ' + textoPz(r._pz) },
+        h('span', { class: 'r-date', 'aria-hidden': 'true' }, h('span', { class: 'r-d', text: d }), h('span', { class: 'r-m', text: MES[m - 1] })),
+        h('span', { class: 'r-main' },
+          h('span', { class: 'r-top' }, uchip(r._u), r._p[0] ? h('span', { class: 'r-dest' }, ic('i-user'), REG.nombre(r._p[0].k)) : null),
+          h('span', { class: 'rep-chips' }, chipsPz(r._pz, false))))));
+    }
+    izq.append(ul);
+    if (conDif.length > 8) izq.append(h('p', { class: 'note', style: 'margin-top:8px', text: 'Y ' + (conDif.length - 8) + ' más. Usa los filtros para verlas.' }));
+  }
+
+  const porMec = new Map();
+  for (const r of conPz) {
+    const k = r._p[0] ? r._p[0].k : null;
+    const v = redondea(r._pz.faltaVale + r._pz.faltaViejas);
+    if (!k || !v) continue;
+    porMec.set(k, redondea((porMec.get(k) || 0) + v));
+  }
+  const mecs = [...porMec].sort((a, b) => b[1] - a[1]).slice(0, 6);
+  const der = h('div', { class: 'rep-col' }, h('p', { class: 'rep-h', text: 'Faltantes por mecánico responsable' }));
+  if (!mecs.length) der.append(h('p', { class: 'note', text: 'Ningún mecánico tiene repuestos ni piezas viejas pendientes.' }));
+  else {
+    const max = Math.max(...mecs.map(x => x[1]));
+    const hb = h('div', { class: 'hbars' });
+    for (const [k, v] of mecs) {
+      const on = S.filt.mec === k;
+      hb.append(h('button', { type: 'button', class: 'hb', 'aria-pressed': String(on), onclick: () => setFiltro({ mec: on ? '' : k }), 'aria-label': REG.nombre(k) + ': ' + fmtN(v) + ' ' + plural(v, 'faltante') + '. ' + (on ? 'Quitar filtro' : 'Filtrar por este mecánico') },
+        h('span', { class: 'hb-l' }, ic('i-user'), h('span', { text: REG.nombre(k) })),
+        h('span', { class: 'hb-v' }, fmtN(v), h('small', { text: plural(v, 'faltante') })),
+        h('span', { class: 'hb-t' }, h('span', { class: 'hb-f rep-f', 'data-w': (v / max * 100).toFixed(2) }))));
+    }
+    der.append(hb);
+    animarAnchos(hb, '.hb-f');
+  }
+  cont.append(h('div', { class: 'rep-cols' }, izq, der));
 }
 function renderRegistro(recs) {
   let lista = recs;
@@ -1733,6 +1935,7 @@ function abrirDetalle(id, opts) {
   fila('Repuestos usados', suave(r.repuestos));
   fila('Comentario', suave(r.comentario));
   cuerpo.append(dl);
+  cuerpo.append(seccionRepuestos(r));
   cuerpo.append(seccionFotos(r));
   if (r.origen !== 'base') cuerpo.append(h('p', { class: 'note', style: 'margin-top:20px', text: (r.origen === 'nuevo' ? 'Esta asistencia todavía no se sube a la hoja de Google.' : 'Los cambios de esta asistencia todavía no se suben a la hoja de Google.') + ' Se suben solos al haber conexión y con el PIN guardado en este equipo.' }));
 
@@ -1744,7 +1947,35 @@ function abrirDetalle(id, opts) {
   Panel.abrir({ titulo: r._u.tipo + ' ' + r._u.cod, sub: r.destino ? 'Asistencia en ' + lugar(r.destino) : 'Asistencia mecánica', cuerpo, pie,
     foco: opts.foco === 'fotos' ? cuerpo.querySelector('#btn-add-fotos') : (opts.foco === 'estado' ? pick.querySelector('[aria-checked="true"]') : null) });
   S.ui.detalle = r.id;
-  if (opts.foco === 'fotos') setTimeout(() => { const s = cuerpo.querySelector('.fotos-h'); if (s) s.scrollIntoView({ block: 'start', behavior: mqReduce.matches ? 'auto' : 'smooth' }); }, 140);
+  if (opts.foco === 'fotos') setTimeout(() => { const s = cuerpo.querySelector('#tit-fotos'); if (s) s.scrollIntoView({ block: 'start', behavior: mqReduce.matches ? 'auto' : 'smooth' }); }, 140);
+  if (opts.foco === 'repuestos') setTimeout(() => { const s = cuerpo.querySelector('#tit-rep'); if (s) s.scrollIntoView({ block: 'start', behavior: mqReduce.matches ? 'auto' : 'smooth' }); }, 140);
+}
+function seccionRepuestos(r) {
+  const lista = r.piezas || [];
+  const sec = h('section', { 'aria-labelledby': 'tit-rep' });
+  sec.append(h('div', { class: 'fotos-h' },
+    h('h3', { id: 'tit-rep', text: 'Repuestos del vale (' + lista.length + ')' }),
+    h('div', { class: 'fotos-tools' }, h('button', { type: 'button', class: 'btn btn-quiet btn-sm', onclick: () => abrirFormulario(r.id, { foco: 'repuestos' }) }, ic(lista.length ? 'i-edit' : 'i-plus'), lista.length ? 'Editar repuestos' : 'Agregar repuestos'))));
+  if (!lista.length) {
+    sec.append(h('p', { class: 'note', text: 'Sin repuestos registrados. Agrega lo que salió de bodega con su vale, lo que se instaló, lo que regresó sin usar y las piezas viejas que se quitaron de la unidad.' }));
+    return sec;
+  }
+  const t = r._pz || resumenPiezas(lista);
+  sec.append(h('div', { class: 'pz-sum', style: 'margin:0 0 10px' }, chipsPz(t)));
+  const cards = h('div', { class: 'pz-cards' });
+  for (const p of lista) {
+    const n = (v, l) => h('div', { class: 'pz-n' }, h('b', { text: v === '' ? '—' : fmtN(v) }), h('span', { text: l }));
+    const meta = [p.codigo ? 'Cód. ' + p.codigo : '', p.vale ? 'Vale ' + p.vale : 'Sin vale'].filter(Boolean).join(' · ');
+    cards.append(h('div', { class: 'pz-card' },
+      h('div', { class: 'pz-top' }, h('span', { class: 'pz-name', text: p.repuesto || 'Repuesto sin nombre' }), h('span', { class: 'pz-meta', text: meta })),
+      h('div', { class: 'pz-nums' }, n(p.salio, 'Salió de bodega'), n(p.instalo, 'Se instaló'), n(p.regreso, 'Regresó sin usar'),
+        p.consumible ? h('div', { class: 'pz-n pz-cons' }, h('b', { text: 'Consumible' }), h('span', { text: 'no lleva pieza vieja' })) : n(p.retirada, 'Pieza vieja retirada'),
+        p.consumible ? null : n(p.entregada, 'Vieja entregada en bodega')),
+      h('div', { class: 'pz-sum' }, chipsPz(resumenLinea(p)))));
+  }
+  sec.append(cards);
+  sec.append(h('p', { class: 'note', style: 'margin-top:10px', text: 'Del vale: ' + fmtN(t.salio) + ' salieron, ' + fmtN(t.instalo) + ' se instalaron y ' + fmtN(t.regreso) + ' regresaron sin usar. Piezas viejas: ' + fmtN(t.entregada) + ' entregadas de ' + fmtN(t.esperadas) + ' esperadas.' }));
+  return sec;
 }
 function seccionFotos(r) {
   const fotos = fotosDe(r.id);
@@ -1842,7 +2073,88 @@ async function eliminarRegistro(id) {
 }
 
 /* ================= Formulario ================= */
-function abrirFormulario(id) {
+function editorPiezas(iniciales, valeBase) {
+  const lista = h('div', { class: 'pz-form' });
+  const filas = [];
+  let seq = 0;
+  const vacioMsg = h('p', { class: 'hint', style: 'margin:0', text: 'Sin repuestos todavía. Agrega cada repuesto que salió de bodega con su vale.' });
+  function agregar(p) {
+    const k = 'pz' + (++seq);
+    p = p || { repuesto: '', codigo: '', vale: valeBase(), salio: '', instalo: '', regreso: '', retirada: '', entregada: '', consumible: false };
+    const txtIn = (id, v, extra) => { const x = h('input', Object.assign({ type: 'text', id, autocomplete: 'off' }, extra || {})); x.value = v || ''; return x; };
+    const numIn = (id, v) => { const x = h('input', { type: 'number', id, inputmode: 'decimal', min: '0', step: 'any' }); x.value = v === '' || v == null ? '' : String(v); return x; };
+    const c = {
+      repuesto: txtIn(k + '-rep', p.repuesto, { list: 'dl-repuestos', placeholder: 'Ej. Filtro de aceite' }),
+      codigo: txtIn(k + '-cod', p.codigo, { placeholder: 'Opcional' }),
+      vale: txtIn(k + '-vale', p.vale, { inputmode: 'numeric', placeholder: 'No.' }),
+      salio: numIn(k + '-sal', p.salio), instalo: numIn(k + '-ins', p.instalo), regreso: numIn(k + '-reg', p.regreso),
+      retirada: numIn(k + '-ret', p.retirada), entregada: numIn(k + '-ent', p.entregada),
+    };
+    const cons = h('input', { type: 'checkbox', id: k + '-cons' });
+    cons.checked = !!p.consumible;
+    const estado = h('div', { class: 'pz-sum', 'aria-live': 'polite' });
+    const err = h('span', { class: 'err', hidden: true });
+    const lab = (el, t) => h('label', { for: el.id }, t, el);
+    const quitar = h('button', { type: 'button', class: 'btn-link pz-quitar' }, ic('i-trash'), 'Quitar');
+    const row = h('div', { class: 'pz-row' },
+      h('div', { class: 'g3' }, lab(c.repuesto, 'Repuesto'), lab(c.codigo, 'Código'), lab(c.vale, 'Vale')),
+      h('div', { class: 'g-num' }, lab(c.salio, 'Salió de bodega'), lab(c.instalo, 'Se instaló'), lab(c.regreso, 'Regresó sin usar')),
+      h('div', { class: 'g-vieja' }, lab(c.retirada, 'Pieza vieja retirada'), lab(c.entregada, 'Vieja entregada en bodega'),
+        h('label', { class: 'pz-check', for: cons.id }, cons, 'Consumible: no lleva pieza vieja (aceite, líquidos…)')),
+      err,
+      h('div', { class: 'pz-foot' }, estado, quitar));
+    const fila = {
+      c,
+      leer() {
+        const o = { repuesto: txtPz(c.repuesto.value), codigo: txtPz(c.codigo.value), vale: txtPz(c.vale.value) };
+        for (const kk of PZ_NUM) o[kk] = numPz(c[kk].value);
+        o.consumible = cons.checked;
+        if (o.consumible) { o.retirada = ''; o.entregada = ''; }
+        return o;
+      },
+      vacia() { const o = fila.leer(); return !o.repuesto && !o.codigo && PZ_NUM.every(kk => o[kk] === '') && PZ_NUM.every(kk => !c[kk].value.trim()); },
+      validar() {
+        let msg = '', foco = null;
+        for (const kk of PZ_NUM) {
+          if (c[kk].disabled) continue;
+          const raw = c[kk].value.trim();
+          if ((raw && numPz(raw) === '') || (c[kk].validity && c[kk].validity.badInput)) { msg = 'Las cantidades deben ser números de 0 en adelante.'; foco = c[kk]; break; }
+        }
+        if (!msg && !fila.vacia() && !txtPz(c.repuesto.value)) { msg = 'Escribe qué repuesto es.'; foco = c.repuesto; }
+        err.hidden = !msg; err.textContent = msg;
+        c.repuesto.setAttribute('aria-invalid', String(foco === c.repuesto));
+        return foco;
+      },
+    };
+    const pintar = () => {
+      c.retirada.disabled = c.entregada.disabled = cons.checked;
+      estado.textContent = '';
+      if (!fila.vacia()) estado.append(...chipsPz(resumenLinea(fila.leer())));
+    };
+    row.addEventListener('input', pintar);
+    cons.addEventListener('change', pintar);
+    quitar.addEventListener('click', () => { const i = filas.indexOf(fila); if (i >= 0) filas.splice(i, 1); row.remove(); vacioMsg.hidden = filas.length > 0; });
+    filas.push(fila);
+    lista.append(row);
+    vacioMsg.hidden = true;
+    pintar();
+    return fila;
+  }
+  (iniciales || []).forEach(p => agregar(p));
+  const btn = h('button', { type: 'button', class: 'btn btn-soft btn-sm' }, ic('i-plus'), 'Agregar repuesto');
+  btn.addEventListener('click', () => { agregar().c.repuesto.focus(); });
+  const el = h('div', { class: 'fl', id: 'fa-piezas' },
+    h('span', null, 'Repuestos del vale', h('span', { class: 'hint', text: ' · lo que salió de bodega, lo que se instaló, lo que regresó y las piezas viejas' })),
+    vacioMsg, lista, h('div', null, btn));
+  return {
+    el,
+    agregar: () => agregar(),
+    get vacio() { return !filas.length; },
+    leer: () => filas.filter(f => !f.vacia()).map(f => f.leer()),
+    validar: () => { let primero = null; for (const f of filas) { const x = f.validar(); if (x && !primero) primero = x; } return primero; },
+  };
+}
+function abrirFormulario(id, opts) {
   const r = id ? S.porId.get(id) : null;
   const v = r ? plano(r) : { fecha: hoyISO(), hora: horaAhora(), estado: 'sin_validar', area: 'Mecánica' };
   if (r) { v.mec1 = r._p[0] ? REG.nombre(r._p[0].k) : ''; v.mec2 = r._p[1] ? REG.nombre(r._p[1].k) : ''; }
@@ -1871,6 +2183,7 @@ function abrirFormulario(id) {
   const fVale = inp('fa-vale', { type: 'text', inputmode: 'numeric' }, v.vale);
   const fEnvio = inp('fa-envio', { type: 'text', inputmode: 'numeric' }, v.envio);
   const fRep = area('fa-repuestos', v.repuestos, 'Ej. 1 caja de velocidades, 1 perilla de palanca');
+  const pz = editorPiezas(v.piezas || [], () => (/^\d+$/.test(fVale.value.trim()) ? fVale.value.trim() : ''));
   const fCom = area('fa-comentario', v.comentario);
 
   const form = h('form', { class: 'form', id: 'form-asis', novalidate: true },
@@ -1882,6 +2195,7 @@ function abrirFormulario(id) {
     campo('fa-falla', 'Falla / trabajo realizado', fFalla),
     h('div', { class: 'fl' }, h('span', { id: 'fa-estado-lbl', text: '¿Regresó el repuesto a bodega?' }), pick),
     h('div', { class: 'row2' }, campo('fa-vale', 'Vale', fVale), campo('fa-envio', 'No. envío', fEnvio)),
+    pz.el,
     campo('fa-repuestos', 'Repuestos usados según tablero', fRep),
     campo('fa-comentario', 'Comentario', fCom));
 
@@ -1909,12 +2223,14 @@ function abrirFormulario(id) {
       fecha: fFecha.value, hora: fHora.value, unidad: fUni.value.trim(), destino: fDest.value.trim(),
       mec1: fM1.value.trim(), mec2: fM2.value.trim(), area: fArea.value, falla: fFalla.value.trim(), estado,
       vale: fVale.value.trim(), envio: fEnvio.value.trim(), repuestos: fRep.value.trim(), comentario: fCom.value.trim(),
+      piezas: pz.leer(),
     };
     marcar(fFecha, datos.fecha ? '' : 'Indica la fecha de la asistencia.');
     marcar(fUni, datos.unidad ? '' : 'Indica la unidad atendida.');
     marcar(fM1, datos.mec1 ? '' : 'Indica el mecánico responsable.');
     marcar(fM2, datos.mec2 && nkey(datos.mec2) === nkey(datos.mec1) ? 'El mecánico de apoyo es el mismo que el responsable.' : '');
-    const malo = form.querySelector('[aria-invalid="true"]');
+    const malPz = pz.validar();
+    const malo = form.querySelector('[aria-invalid="true"]') || malPz;
     if (malo) { malo.focus(); return; }
     const o = limpia(Object.assign({ id: r ? r.id : nuevoId('N') }, datos));
     if (r) { if (r.creado) o.creado = r.creado; o.editado = new Date().toISOString(); }
@@ -1934,6 +2250,11 @@ function abrirFormulario(id) {
     pie: [h('button', { type: 'button', class: 'btn btn-quiet', onclick: () => (r ? abrirDetalle(r.id) : Panel.cerrar()), text: 'Cancelar' }), guardar],
     foco: r ? null : fUni,
   });
+  if (opts && opts.foco === 'repuestos') setTimeout(() => {
+    if (pz.vacio) pz.agregar();
+    pz.el.scrollIntoView({ block: 'start', behavior: mqReduce.matches ? 'auto' : 'smooth' });
+    const i = pz.el.querySelector('input'); if (i) i.focus({ preventScroll: true });
+  }, 160);
 }
 
 /* ================= Fotos ================= */
@@ -2214,6 +2535,20 @@ async function exportarExcel() {
   for (let i = 1; i < res.length; i++) { const c = wr[XLSX.utils.encode_cell({ r: i, c: 9 })]; if (c && c.t === 'n') c.z = '0%'; }
   wr['!cols'] = [34, 12, 18, 10, 22, 20, 26, 10, 12, 22].map(w => ({ wch: w }));
   XLSX.utils.book_append_sheet(wb, wr, 'RESUMEN MECANICOS');
+  const lineas = [];
+  for (const r of S.records.slice().reverse()) for (const p of r.piezas || []) {
+    const { dif, pend } = lineaPz(p);
+    lineas.push([serialExcel(r.fecha, r.hora), r.unidad, r._p[0] ? REG.nombre(r._p[0].k) : '', numOTexto(p.vale), p.codigo, p.repuesto,
+      p.salio, p.instalo, p.regreso, p.consumible ? '' : p.retirada, p.consumible ? '' : p.entregada, p.consumible ? 'SÍ' : '', dif, pend, textoPz(resumenLinea(p))]);
+  }
+  if (lineas.length) {
+    const cab = ['FECHA', 'UNIDAD', 'MECANICO RESPONSABLE', 'VALE', 'CODIGO', 'REPUESTO', 'SALIÓ DE BODEGA', 'SE INSTALÓ', 'REGRESÓ SIN USAR', 'PIEZA VIEJA RETIRADA', 'PIEZA VIEJA ENTREGADA', 'CONSUMIBLE', 'DIFERENCIA DEL VALE', 'PIEZAS VIEJAS PENDIENTES', 'REVISIÓN'];
+    const wp = XLSX.utils.aoa_to_sheet([cab].concat(lineas));
+    for (let i = 1; i <= lineas.length; i++) { const c = wp[XLSX.utils.encode_cell({ r: i, c: 0 })]; if (c) { c.t = 'n'; c.z = 'dd/mm/yyyy'; } }
+    wp['!cols'] = [12, 30, 30, 10, 12, 34, 10, 10, 10, 12, 12, 11, 12, 14, 34].map(w => ({ wch: w }));
+    wp['!autofilter'] = { ref: 'A1:O' + (lineas.length + 1) };
+    XLSX.utils.book_append_sheet(wb, wp, 'REPUESTOS');
+  }
   XLSX.writeFile(wb, 'control_asistencias_' + hoyISO() + '.xlsx');
   toast('Excel descargado');
 }
@@ -2375,7 +2710,7 @@ async function subirPendientes(op) {
   try {
     if (pendR.length) {
       const ahora = new Date().toISOString();
-      const envio = pendR.map(r => (r._deleted ? { id: r.id, eliminado: true, editado: r.editado || ahora } : Object.assign(plano(r), { eliminado: false })));
+      const envio = pendR.map(r => (r._deleted ? { id: r.id, eliminado: true, editado: r.editado || ahora } : Object.assign(plano(r), { eliminado: false, piezas: r.piezas && r.piezas.length ? r.piezas : '' })));
       const res = await nubePost({ accion: 'guardar', pin, registros: envio }, 90000);
       Nube.gen++;
       const resultado = new Map((res.resultado || []).map(x => [String(x.id), x]));
@@ -2629,6 +2964,7 @@ function initEventos() {
     else if (b.dataset.act === 'fotos') abrirDetalle(id, { foco: 'fotos' });
     else if (b.dataset.act === 'editar') abrirFormulario(id);
   });
+  $('#rep-cuerpo').addEventListener('click', e => { const b = e.target.closest('.rep-item'); if (b) abrirDetalle(b.dataset.id, { foco: 'repuestos' }); });
   $('#btn-nueva').addEventListener('click', () => abrirFormulario());
   $('#fab-nueva').addEventListener('click', () => abrirFormulario());
   $('#in-fotos').addEventListener('change', e => {
