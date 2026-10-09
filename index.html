@@ -79,7 +79,8 @@ h1,h2,h3{text-wrap:balance}
 .num{font-variant-numeric:tabular-nums}
 
 /* ---------- Banda superior ---------- */
-.band{position:relative;isolation:isolate;overflow:hidden;background:var(--band);color:var(--band-ink)}
+/* overflow:clip visible deja ver el menú Datos completo debajo de la banda (los navegadores viejos usan hidden). */
+.band{position:relative;z-index:45;isolation:isolate;overflow:hidden;overflow:clip visible;background:var(--band);color:var(--band-ink)}
 .band::before{content:"";position:absolute;inset:0;z-index:-1;
   background:
     radial-gradient(760px 340px at 88% -20%, color-mix(in srgb, var(--accent) 42%, transparent), transparent 70%),
@@ -421,6 +422,7 @@ fieldset.fl legend{padding:0;margin-bottom:6px}
   .band-in{grid-template-columns:minmax(0,1fr)}
   .band-actions{justify-content:flex-start}
   .band .btn-nueva{display:none}
+  .menu{left:0;right:auto}
   .fab{display:inline-flex}
   .toast{bottom:calc(86px + env(safe-area-inset-bottom,0px))}
   .filters{position:static}
@@ -464,6 +466,24 @@ fieldset.fl legend{padding:0;margin-bottom:6px}
   *,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important;scroll-behavior:auto!important}
 }
 
+/* ---------- Sincronización con la hoja de Google ---------- */
+.pill-sync{font:inherit;font-size:12.5px;line-height:1.2;text-align:left;cursor:pointer;transition:background-color .15s,border-color .15s}
+.pill-sync:hover{background:var(--band-line)}
+.pill-sync .dot{background:var(--band-muted)}
+.pill-sync[data-estado="ok"] .dot{background:var(--ok)}
+.pill-sync[data-estado="cargando"] .dot,.pill-sync[data-estado="subiendo"] .dot{background:var(--accent);animation:latido 1.1s ease-in-out infinite}
+.pill-sync[data-estado="pin"] .dot,.pill-sync[data-estado="pendiente"] .dot{background:var(--warn)}
+.pill-sync[data-estado="error"] .dot{background:var(--bad)}
+@keyframes latido{50%{opacity:.3}}
+.dlg{width:min(400px,calc(100vw - 32px));max-width:none;padding:0;border:1px solid var(--line);border-radius:var(--r);background:var(--panel);color:var(--ink);box-shadow:var(--shadow)}
+.dlg::backdrop{background:var(--scrim)}
+.dlg form{display:grid;gap:14px;padding:22px 20px 18px}
+.dlg h2{margin:0;font:800 28px/1 var(--font-display);text-transform:uppercase;letter-spacing:.01em}
+.dlg p{margin:0;color:var(--ink-2);font-size:14.5px}
+.dlg .pin-in{font:600 24px/1 var(--font-mono);letter-spacing:.35em;text-align:center;-webkit-text-security:disc}
+.dlg-f{display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end;align-items:center}
+.dlg-f .spacer{flex:1}
+
 </style>
 </head>
 <body>
@@ -506,6 +526,8 @@ fieldset.fl legend{padding:0;margin-bottom:6px}
     <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></symbol>
     <symbol id="i-tire" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.5"/><path d="M12 3v5.5M12 15.5V21M3 12h5.5M15.5 12H21"/></symbol>
     <symbol id="i-flag" viewBox="0 0 24 24"><path d="M4 22V4M4 4h13l-2 4 2 4H4"/></symbol>
+    <symbol id="i-sync" viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14.3-4.9L4 8"/><path d="M4 3v5h5"/><path d="M4 13a8 8 0 0 0 14.3 4.9L20 16"/><path d="M20 21v-5h-5"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></symbol>
   </defs>
 </svg>
 
@@ -522,7 +544,7 @@ fieldset.fl legend{padding:0;margin-bottom:6px}
       <p class="lede">Cuántas asistencias hace cada mecánico, si el repuesto físico regresa a bodega y la evidencia fotográfica de cada trabajo.</p>
       <div class="band-meta">
         <span class="pill-band"><span class="dot" aria-hidden="true"></span><span id="meta-actualizado">Cargando datos…</span></span>
-        <span class="pill-band" id="meta-local" hidden></span>
+        <button type="button" class="pill-band pill-sync" id="meta-local" data-estado="cargando"><span class="dot" aria-hidden="true"></span><span id="meta-sync">Conectando con la hoja…</span></button>
       </div>
     </div>
     <div class="band-actions">
@@ -533,10 +555,12 @@ fieldset.fl legend{padding:0;margin-bottom:6px}
           <button type="button" role="menuitem" data-accion="importar"><svg class="ic"><use href="#i-upload"/></svg><span>Importar Excel<small>Agrega o actualiza asistencias desde tu control (.xlsx).</small></span></button>
           <button type="button" role="menuitem" data-accion="exportar"><svg class="ic"><use href="#i-sheet"/></svg><span>Exportar a Excel<small>Una hoja por mes, más el resumen por mecánico.</small></span></button>
           <hr>
-          <button type="button" role="menuitem" data-accion="respaldo"><svg class="ic"><use href="#i-download"/></svg><span>Descargar respaldo<small>Lo que agregaste en este navegador, con fotos.</small></span></button>
-          <button type="button" role="menuitem" data-accion="restaurar"><svg class="ic"><use href="#i-restore"/></svg><span>Restaurar respaldo<small>Carga el respaldo de otro equipo o de un compañero.</small></span></button>
+          <button type="button" role="menuitem" data-accion="sincronizar"><svg class="ic"><use href="#i-sync"/></svg><span>Actualizar ahora<small>Trae lo último de la hoja de Google y sube lo pendiente.</small></span></button>
+          <button type="button" role="menuitem" data-accion="hoja"><svg class="ic"><use href="#i-sheet"/></svg><span>Abrir la hoja de Google<small>Todos los registros en Google Sheets (con tu cuenta).</small></span></button>
+          <button type="button" role="menuitem" data-accion="pin"><svg class="ic"><use href="#i-lock"/></svg><span>PIN de este equipo<small>Se pide una vez para poder registrar desde aquí.</small></span></button>
           <hr>
-          <button type="button" role="menuitem" data-accion="publicar"><svg class="ic"><use href="#i-code"/></svg><span>Generar index.html para GitHub<small>Un archivo con todo incluido para que todos lo vean.</small></span></button>
+          <button type="button" role="menuitem" data-accion="respaldo"><svg class="ic"><use href="#i-download"/></svg><span>Descargar respaldo<small>Lo que está en este equipo sin subir, con fotos.</small></span></button>
+          <button type="button" role="menuitem" data-accion="restaurar"><svg class="ic"><use href="#i-restore"/></svg><span>Restaurar respaldo<small>Carga el respaldo de otro equipo y lo sube a la hoja.</small></span></button>
         </div>
       </div>
       <button class="btn-icon" id="btn-tema" type="button" aria-label="Cambiar a tema oscuro"><svg class="ic"><use href="#i-moon"/></svg></button>
@@ -663,7 +687,7 @@ fieldset.fl legend{padding:0;margin-bottom:6px}
 </main>
 
 <footer class="wrap foot">
-  <p>Las asistencias y fotos que agregues se guardan <b>en este navegador</b>. Para pasarlas a otro equipo usa <b>Datos → Descargar respaldo</b>. Si varias personas capturan, cada una descarga su respaldo y tú lo cargas con <b>Restaurar respaldo</b>; luego <b>Generar index.html</b> y súbelo a GitHub para que todos vean lo mismo.</p>
+  <p>Las asistencias y fotos se guardan en la hoja de Google <b>Control de Asistencias – Datos</b>, así que todos ven lo mismo al abrir o recargar esta página. Si no hay internet, lo que registres se queda en este equipo y se sube solo cuando vuelve la conexión. Para registrar o editar se pide un <b>PIN</b> una sola vez por equipo.</p>
   <p id="pie-base"></p>
 </footer>
 
@@ -687,6 +711,15 @@ fieldset.fl legend{padding:0;margin-bottom:6px}
   <div class="lb-bar" id="visor-barra"></div>
 </div>
 
+<dialog class="dlg" id="dlg-pin" aria-labelledby="pin-titulo">
+  <form id="pin-form" novalidate>
+    <h2 id="pin-titulo">PIN para registrar</h2>
+    <p id="pin-texto"></p>
+    <div class="fl"><label for="pin-in">PIN</label><input class="in pin-in" id="pin-in" type="text" inputmode="numeric" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="12" aria-describedby="pin-err"><span class="err" id="pin-err" hidden></span></div>
+    <div class="dlg-f"><button type="button" class="btn-link" id="pin-quitar" hidden>Quitar PIN de este equipo</button><span class="spacer"></span><button type="button" class="btn btn-quiet" id="pin-luego">Ahora no</button><button type="submit" class="btn btn-primary" id="pin-ok">Guardar PIN</button></div>
+  </form>
+</dialog>
+
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div class="tip" id="tip" hidden></div>
 <input type="file" id="in-fotos" accept="image/*" multiple hidden>
@@ -698,15 +731,17 @@ fieldset.fl legend{padding:0;margin-bottom:6px}
 (function () {
 'use strict';
 
-/* Copia del documento tal como llegó: sirve para generar el index.html actualizado. */
-const PRISTINE = '<!doctype html>\n' + document.documentElement.outerHTML;
 const NS = document.querySelector('svg').namespaceURI;
-const AVISO_TEXTO = '<!--\n  CONTROL DE ASISTENCIAS · tablero web de un solo archivo.\n  Si estás leyendo este texto, el archivo se abrió como código y no como página.\n  Para verlo: descárgalo y ábrelo con doble clic en Chrome, Edge o Safari,\n  o entra al enlace de GitHub Pages donde está publicado.\n-->\n';
 const mqReduce = window.matchMedia('(prefers-reduced-motion: reduce)');
 const XLSX_URLS = [
   'https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js',
 ];
+/* Hoja de Google donde se guardan las asistencias (Apps Script publicado como aplicación web). */
+const NUBE_URL = 'https://script.google.com/macros/s/AKfycbyS15SKsV2_gi2hLgcad8jW_8ZTT06mxW4koy2aR3DVdBo3uix5sdaJ4gAiPsLTu_5zSg/exec';
+const HOJA_URL = 'https://docs.google.com/spreadsheets/d/1wrNOg5GuJYyWuem0Fo7cLU40sabFtKnNfXULacOaRtg/edit';
+const PIN_KEY = 'ca-pin';
+const CACHE_KEY = 'ca-nube';
 
 /* ================= Catálogos ================= */
 const ESTADOS = [
@@ -817,7 +852,6 @@ function descargar(blob, nombre) {
 }
 const blobADataURL = b => new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.onerror = () => rej(fr.error); fr.readAsDataURL(b); });
 const dataURLABlob = d => fetch(d).then(r => r.blob());
-const mb = bytes => (bytes / 1048576).toLocaleString('es-GT', { maximumFractionDigits: 1, minimumFractionDigits: 1 });
 
 function unidadInfo(u) {
   const s = String(u || '').replace(/\s+/g, ' ').trim();
@@ -939,8 +973,11 @@ const S = {
   porId: new Map(),
   fotosBy: new Map(),
   persistente: true,
+  nubeIds: new Set(),
+  subidos: new Set(),
+  fotosRecientes: new Map(),
   filt: { periodo: 'todo', mec: '', area: '', estado: '', q: '' },
-  ui: { orden: 'total', mecTodos: false, mecTabla: false, regFoto: '', regLimite: 20, detalle: null, tipoFoto: '', mecMap: new Map(), diaFoco: null },
+  ui: { orden: 'total', mecTodos: false, mecTabla: false, regFoto: '', regLimite: 20, detalle: null, tipoFoto: '', mecMap: new Map(), diaFoco: null, pinPospuesto: false },
 };
 let REG = null;
 
@@ -1050,17 +1087,35 @@ function reconstruirFotos() {
   for (const f of S.fotosLocal.values()) { if (f._deleted) { ocultas.add(f.id); continue; } push(f.registroId, f); }
   for (const f of S.seed.fotos) {
     if (ocultas.has(f.id) || S.fotosLocal.has(f.id)) continue;
-    push(f.registroId, { id: f.id, registroId: f.registroId, tipo: f.tipo || 'Otra', creado: f.creado || '', src: f.data, origen: 'base' });
+    push(f.registroId, { id: f.id, registroId: f.registroId, tipo: f.tipo || 'Otra', creado: f.creado || '', src: f.src || f.data, mini: f.mini || '', driveId: f.driveId || '', origen: 'base' });
   }
   for (const l of by.values()) l.sort((a, b) => String(a.creado).localeCompare(String(b.creado)));
   S.fotosBy = by;
 }
 const fotosDe = id => S.fotosBy.get(id) || [];
 const nFotos = id => fotosDe(id).length;
-function srcFoto(f) {
+function srcFoto(f, mini) {
+  if (mini && f.mini) return f.mini;
   if (f.src) return f.src;
   if (!f._url && f.blob) f._url = URL.createObjectURL(f.blob);
   return f._url || '';
+}
+/* Si la miniatura de Google Drive no carga, la foto se pide al servidor de la hoja. */
+const fotosDescargadas = new Map();
+function fotoDesdeNube(driveId) {
+  if (!fotosDescargadas.has(driveId)) {
+    const p = nubeGet('?accion=foto&id=' + encodeURIComponent(driveId))
+      .then(d => { if (!d || !d.ok || !d.data) throw new Error('Sin foto'); return dataURLABlob('data:' + (d.tipo || 'image/jpeg') + ';base64,' + d.data); })
+      .then(b => URL.createObjectURL(b))
+      .catch(e => { fotosDescargadas.delete(driveId); throw e; });
+    fotosDescargadas.set(driveId, p);
+  }
+  return fotosDescargadas.get(driveId);
+}
+function imagenConRespaldo(img, f, mini) {
+  img.onerror = null;
+  if (f.driveId) img.onerror = () => { img.onerror = null; fotoDesdeNube(f.driveId).then(u => { img.src = u; }).catch(() => {}); };
+  img.src = srcFoto(f, mini);
 }
 function mismoRegistro(a, b) {
   for (const k of CAMPOS) { if (k === 'mec1' || k === 'mec2') continue; if ((a[k] || '') !== (b[k] || '')) return false; }
@@ -1194,7 +1249,7 @@ function renderFiltros() {
   for (const e of ESTADOS) se.append(h('option', { value: e.k, text: e.label }));
   se.value = S.filt.estado;
 
-  if ($('#f-q').value !== S.filt.q) $('#f-q').value = S.filt.q;
+  if ($('#f-q').value !== S.filt.q && document.activeElement !== $('#f-q')) $('#f-q').value = S.filt.q;
 
   const lista = (id, valores) => {
     let dl = document.getElementById(id);
@@ -1555,7 +1610,7 @@ function filaRegistro(r) {
         h('span', { class: 'r-falla' + (r.falla ? '' : ' vacia'), text: r.falla ? suave(r.falla) : 'Sin detalle de la falla' }),
         r._p.length ? h('span', { class: 'r-mecs' }, r._p.map((p, i) => h('span', null, ic(i ? 'i-users' : 'i-user'), REG.nombre(p.k)))) : null),
       h('span', { class: 'r-side' }, chipEstado(r.estado), vale ? h('span', { class: 'r-vale', text: vale }) : null,
-        r.origen !== 'base' ? h('span', { class: 'tag', title: 'Guardado solo en este navegador', text: 'Sin publicar' }) : null)),
+        r.origen !== 'base' ? h('span', { class: 'tag', title: 'Guardada en este equipo; se sube sola a la hoja de Google', text: 'Sin subir' }) : null)),
     h('div', { class: 'r-actions' },
       h('button', { type: 'button', class: 'btn-foto', 'data-act': 'fotos', 'aria-label': n ? 'Fotos de esta asistencia (' + n + ')' : 'Agregar fotos a esta asistencia' }, ic('i-camera'), n ? h('span', { class: 'n', text: n }) : 'Fotos'),
       h('button', { type: 'button', class: 'btn-icon', 'data-act': 'editar', 'aria-label': 'Editar asistencia' }, ic('i-edit'))));
@@ -1599,12 +1654,12 @@ function resaltar(id) {
 function actualizarMeta() {
   const ult = S.records[0];
   $('#meta-actualizado').textContent = ult ? 'Última asistencia: ' + fechaLarga(ult.fecha) : 'Sin asistencias registradas';
-  const cambios = S.local.size;
-  const fotosL = [...S.fotosLocal.values()].filter(f => !f._deleted).length;
-  const ml = $('#meta-local');
-  ml.hidden = !(cambios || fotosL);
-  ml.textContent = 'Sin publicar en este navegador: ' + cambios + ' ' + plural(cambios, 'cambio') + ' · ' + fotosL + ' ' + plural(fotosL, 'foto');
-  $('#pie-base').textContent = 'Datos publicados: ' + S.seed.registros.length + ' asistencias' + (S.seed.fotos.length ? ' y ' + S.seed.fotos.length + ' fotos' : '') + (S.seed.generado ? ', actualizados el ' + fechaLarga(S.seed.generado) : '') + '.';
+  pintarSync();
+  const n = S.seed.registros.length, nf2 = S.seed.fotos.length;
+  const cuenta = n + ' ' + plural(n, 'asistencia') + (nf2 ? ' y ' + nf2 + ' ' + plural(nf2, 'foto') : '');
+  $('#pie-base').textContent = S.seed.origen === 'nube' ? 'En la hoja de Google: ' + cuenta + '. Leída a las ' + momento(Nube.ultima) + '.'
+    : S.seed.origen === 'cache' ? 'Copia guardada en este equipo (' + cuenta + ') de ' + momento(Nube.ultima) + '. Se actualiza al conectar con la hoja.'
+    : 'Todavía no se pudo leer la hoja de Google; se muestran los datos incluidos en esta página.';
 }
 
 /* ================= Panel lateral ================= */
@@ -1640,7 +1695,7 @@ const Panel = (() => {
   }
   sc.addEventListener('click', cerrar);
   $('#panel-cerrar').addEventListener('click', cerrar);
-  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !p.hidden && $('#visor').hidden && !p.contains(e.target)) cerrar(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !p.hidden && $('#visor').hidden && !$('#dlg-pin').open && !p.contains(e.target)) cerrar(); });
   p.addEventListener('keydown', e => {
     if (e.key === 'Escape') { e.stopPropagation(); cerrar(); }
     else if (e.key === 'Tab') trampaFoco(e, p);
@@ -1679,7 +1734,7 @@ function abrirDetalle(id, opts) {
   fila('Comentario', suave(r.comentario));
   cuerpo.append(dl);
   cuerpo.append(seccionFotos(r));
-  if (r.origen !== 'base') cuerpo.append(h('p', { class: 'note', style: 'margin-top:20px', text: (r.origen === 'nuevo' ? 'Esta asistencia está guardada solo en este navegador.' : 'Los cambios de esta asistencia están guardados solo en este navegador.') + ' Para que todos la vean usa Datos → Generar index.html.' }));
+  if (r.origen !== 'base') cuerpo.append(h('p', { class: 'note', style: 'margin-top:20px', text: (r.origen === 'nuevo' ? 'Esta asistencia todavía no se sube a la hoja de Google.' : 'Los cambios de esta asistencia todavía no se suben a la hoja de Google.') + ' Se suben solos al haber conexión y con el PIN guardado en este equipo.' }));
 
   const pie = [
     h('button', { type: 'button', class: 'btn btn-danger btn-sm', onclick: () => confirmarEliminar(r.id) }, ic('i-trash'), 'Eliminar'),
@@ -1706,7 +1761,7 @@ function seccionFotos(r) {
     const g = h('div', { class: 'fgrid' });
     fotos.forEach((f, i) => {
       const img = h('img', { alt: f.tipo + ', foto ' + (i + 1), loading: 'lazy', decoding: 'async' });
-      img.src = srcFoto(f);
+      imagenConRespaldo(img, f, true);
       g.append(h('button', { type: 'button', class: 'fthumb', 'aria-label': 'Ver foto ' + (i + 1) + ': ' + f.tipo, onclick: () => Visor.abrir(r.id, i) }, img, h('span', { text: f.tipo })));
     });
     sec.append(g);
@@ -1735,10 +1790,11 @@ async function guardarRegistro(o) {
     await persistirRegistros([o]);
   } catch (e) {
     console.error(e);
-    toast('No se pudo guardar en este navegador.');
+    toast('No se pudo guardar en este equipo.');
     throw e;
   }
   reconstruir(); renderFiltros(); renderTodo(); actualizarMeta();
+  programarSync();
 }
 async function cambiarEstado(id, k) {
   const r = S.porId.get(id);
@@ -1757,24 +1813,30 @@ function confirmarEliminar(id) {
   si.focus();
 }
 async function eliminarRegistro(id) {
-  if (!S.porId.get(id)) return;
-  const antes = { local: S.local.get(id) || null, fotos: [...S.fotosLocal.values()].filter(f => f.registroId === id) };
-  const esBase = S.seed.registros.some(x => x.id === id);
+  const r = S.porId.get(id);
+  if (!r) return;
+  const antes = { local: S.local.get(id) || null, fotos: [...S.fotosLocal.values()].filter(f => f.registroId === id), plano: plano(r) };
+  const enNube = S.nubeIds.has(id) || S.subidos.has(id) || S.seed.registros.some(x => x.id === id);
   try {
-    if (esBase) { const t = { id, _deleted: true }; await Store.poner('registros', t); S.local.set(id, t); }
+    if (enNube) { const t = { id, _deleted: true, editado: new Date().toISOString() }; await Store.poner('registros', t); S.local.set(id, t); }
     else { await Store.quitar('registros', id); S.local.delete(id); }
     const ids = antes.fotos.map(f => f.id);
     if (ids.length) { await Store.quitar('fotos', ids); ids.forEach(x => S.fotosLocal.delete(x)); }
   } catch (e) { console.error(e); toast('No se pudo eliminar.'); return; }
   Panel.cerrar();
   reconstruir(); renderFiltros(); renderTodo(); actualizarMeta();
+  programarSync();
   toast('Asistencia eliminada', { label: 'Deshacer', fn: async () => {
     try {
-      if (antes.local) { await Store.poner('registros', antes.local); S.local.set(id, antes.local); }
-      else { await Store.quitar('registros', id); S.local.delete(id); }
+      if (enNube) {
+        /* Se guarda de nuevo como un cambio más reciente: así se recupera aunque la eliminación ya se haya subido. */
+        const o = Object.assign({}, antes.local && !antes.local._deleted ? antes.local : antes.plano, { editado: new Date().toISOString() });
+        await Store.poner('registros', o); S.local.set(id, o);
+      } else if (antes.local) { await Store.poner('registros', antes.local); S.local.set(id, antes.local); }
       if (antes.fotos.length) { await Store.poner('fotos', antes.fotos.map(f => { const c = Object.assign({}, f); delete c._url; return c; })); antes.fotos.forEach(f => S.fotosLocal.set(f.id, f)); }
     } catch (e) { toast('No se pudo deshacer.'); return; }
     reconstruir(); renderFiltros(); renderTodo(); actualizarMeta();
+    programarSync();
     toast('Asistencia restaurada');
   } });
 }
@@ -1932,7 +1994,7 @@ async function subirFotos(rid, files, tipo, silencioso) {
   reconstruirFotos();
   renderTodo(); actualizarMeta();
   if (Panel.abierto && S.ui.detalle === rid) abrirDetalle(rid, { foco: 'fotos' });
-  if (ok) pedirPersistencia();
+  if (ok) { pedirPersistencia(); programarSync(); }
   const partesMsg = [];
   if (ok && !silencioso) partesMsg.push(ok + ' ' + plural(ok, 'foto agregada', 'fotos agregadas'));
   if (fallas.length) partesMsg.push('No se pudo leer ' + fallas.slice(0, 2).join(', ') + (fallas.length > 2 ? '…' : '') + '. Prueba con JPG o PNG');
@@ -1943,8 +2005,9 @@ async function eliminarFoto(f) {
   const tumba = { id: f.id, registroId: f.registroId, _deleted: true };
   if (f.origen === 'base' || S.seed.fotos.some(x => x.id === f.id)) { await Store.poner('fotos', tumba); S.fotosLocal.set(f.id, tumba); }
   else { await Store.quitar('fotos', f.id); S.fotosLocal.delete(f.id); }
-  if (f._url) URL.revokeObjectURL(f._url);
+  if (f._url && !S.fotosRecientes.has(f.id)) URL.revokeObjectURL(f._url);
   reconstruirFotos();
+  programarSync();
 }
 const Visor = (() => {
   const v = $('#visor'), img = $('#visor-img'), capt = $('#visor-cap'), barra = $('#visor-barra');
@@ -1954,11 +2017,11 @@ const Visor = (() => {
     if (!fotos.length) { cerrar(); return; }
     idx = (idx + fotos.length) % fotos.length;
     const f = fotos[idx];
-    img.src = srcFoto(f);
+    imagenConRespaldo(img, f, false);
     img.alt = f.tipo + ', foto ' + (idx + 1) + ' de ' + fotos.length;
     capt.textContent = '';
     capt.append(h('span', { text: f.tipo + ' · ' + (idx + 1) + ' de ' + fotos.length }),
-      h('small', { text: (f.creado ? 'Agregada el ' + fechaLarga(String(f.creado).slice(0, 10)) : '') + (f.origen === 'base' ? ' · publicada' : ' · guardada en este navegador') }));
+      h('small', { text: (f.creado ? 'Agregada el ' + fechaLarga(String(f.creado).slice(0, 10)) : '') + (f.origen === 'base' ? ' · en la hoja de Google' : ' · en este equipo, sin subir') }));
     $('#visor-ant').hidden = $('#visor-sig').hidden = fotos.length < 2;
     barra.textContent = '';
     barra.append(h('button', { type: 'button', class: 'btn btn-sm', onclick: confirmar }, ic('i-trash'), 'Eliminar foto'));
@@ -1980,7 +2043,7 @@ const Visor = (() => {
   }
   function abrir(r, i) { rid = r; idx = i; previo = document.activeElement; v.hidden = false; pintar(); $('#visor-cerrar').focus(); }
   function cerrar() {
-    v.hidden = true; img.removeAttribute('src');
+    v.hidden = true; img.onerror = null; img.removeAttribute('src');
     const el = previo; previo = null;
     if (el && document.contains(el)) el.focus();
     else { const b = document.getElementById('btn-add-fotos'); if (b) b.focus(); }
@@ -2115,6 +2178,7 @@ async function importarExcel(file) {
   if (escribir.length) {
     await persistirRegistros(escribir);
     reconstruir(); renderFiltros(); renderTodo(); actualizarMeta();
+    programarSync();
   }
   toast('Excel importado: ' + nuevas + ' ' + plural(nuevas, 'nueva') + ', ' + act + ' ' + plural(act, 'actualizada') + ', ' + igual + ' sin cambios.');
 }
@@ -2158,7 +2222,7 @@ async function exportarExcel() {
 async function descargarRespaldo() {
   const regs = [...S.local.values()];
   const fotosL = [...S.fotosLocal.values()];
-  if (!regs.length && !fotosL.length) { toast('Todavía no hay nada guardado solo en este navegador.'); return; }
+  if (!regs.length && !fotosL.length) { toast('No hay nada pendiente en este equipo: todo está en la hoja de Google.'); return; }
   toast('Preparando el respaldo…');
   const fotos = [];
   for (const f of fotosL) {
@@ -2186,63 +2250,279 @@ async function restaurarRespaldo(file) {
   catch (e) { console.error(e); toast('No se pudo restaurar: el navegador no tiene espacio suficiente.'); return; }
   fotos.forEach(f => { f.origen = 'local'; S.fotosLocal.set(f.id, f); });
   reconstruir(); await reconciliar(); renderFiltros(); renderTodo(); actualizarMeta();
+  programarSync();
   toast('Respaldo cargado: ' + regs.length + ' ' + plural(regs.length, 'registro') + ' y ' + fotos.filter(f => !f._deleted).length + ' fotos.');
 }
 
-/* ================= Publicar (index.html actualizado) ================= */
-function abrirPublicar() {
-  const vivas = [...S.fotosBy.entries()].filter(([rid]) => S.porId.has(rid)).flatMap(([, l]) => l);
-  const peso = vivas.reduce((s, f) => s + (f.src ? f.src.length * 0.75 : (f.size || 250000) * 0.6), 0) * 1.34;
-  let chk = null;
-  const cuerpo = h('div', { class: 'form' },
-    h('p', { class: 'note', text: 'El archivo tendrá ' + S.records.length + ' asistencias' + (vivas.length ? ' y ' + vivas.length + ' ' + plural(vivas.length, 'foto') : '') + '. Quien abra tu página de GitHub verá exactamente esto, sin depender de su navegador.' }),
-    vivas.length ? h('label', { class: 'check', for: 'pub-fotos' }, (chk = h('input', { type: 'checkbox', id: 'pub-fotos', checked: true })),
-      h('span', null, h('b', { text: 'Incluir las fotos' }), h('br'), h('span', { style: 'color:var(--muted)', text: 'El archivo pesará cerca de ' + mb(peso + 160000) + ' MB.' }))) : null,
-    h('p', { class: 'sec-t', text: 'Cómo publicarlo' }),
-    h('ol', { class: 'steps' },
-      h('li', null, 'Descarga el archivo con el botón de abajo.'),
-      h('li', null, 'En tu repositorio de GitHub entra a ', h('b', { text: 'Add file → Upload files' }), ' y sube el nuevo ', h('b', { text: 'index.html' }), ' (reemplaza al anterior).'),
-      h('li', null, 'Toca ', h('b', { text: 'Commit changes' }), '. En unos minutos la página muestra la versión nueva (si no, recárgala).')),
-    h('p', { class: 'note', text: 'Ojo: una página de GitHub Pages es pública para quien tenga el enlace. Incluye nombres de mecánicos, vales y fotos.' }));
-  const btn = h('button', { type: 'button', class: 'btn btn-primary' }, ic('i-download'), 'Descargar index.html');
-  btn.addEventListener('click', async () => {
-    btn.disabled = true;
-    const txtBtn = btn.lastChild; txtBtn.textContent = 'Preparando…';
-    try { await generarIndex(chk ? chk.checked : false); Panel.cerrar(); toast('index.html descargado. Súbelo a tu repositorio.'); }
-    catch (e) { console.error(e); toast(e && e.message ? e.message : 'No se pudo generar el archivo.'); btn.disabled = false; txtBtn.textContent = 'Descargar index.html'; }
-  });
-  Panel.abrir({ titulo: 'Publicar en GitHub', sub: 'Una copia del tablero con todo lo registrado', cuerpo, pie: [h('button', { type: 'button', class: 'btn btn-quiet', onclick: () => Panel.cerrar(), text: 'Cancelar' }), btn], foco: btn });
+/* ================= Hoja de Google: lectura, subida y PIN ================= */
+const Nube = { estado: 'cargando', ultima: 0, ultimoIntento: 0, subiendo: false, faltaPin: false, otraVez: false, reintentos: 0, firma: '', cargandoP: null, error: '', gen: 0, releer: false };
+const esSi = v => v === true || /^(s[ií]|true|1|x)$/i.test(String(v == null ? '' : v).trim());
+const urlMiniatura = (id, ancho) => 'https://drive.google.com/thumbnail?id=' + encodeURIComponent(id) + '&sz=w' + ancho;
+function momento(ms) {
+  if (!ms) return '—';
+  const d = new Date(ms), hm = pad(d.getHours()) + ':' + pad(d.getMinutes());
+  return iso(d) === hoyISO() ? hm : fechaCorta(iso(d)) + ' ' + hm;
 }
-async function generarIndex(conFotos) {
-  let fuente = null;
-  if (/^https?:$/.test(location.protocol)) {
-    try { const r = await fetch(location.href.split('#')[0], { cache: 'no-store' }); if (r.ok) fuente = await r.text(); } catch (e) { /* se usa la copia */ }
+let pinMemoria = '';
+function leerPin() { try { return localStorage.getItem(PIN_KEY) || pinMemoria; } catch (e) { return pinMemoria; } }
+function guardarPin(p) { pinMemoria = p || ''; try { if (p) localStorage.setItem(PIN_KEY, p); else localStorage.removeItem(PIN_KEY); } catch (e) { /* queda solo en memoria */ } }
+function leerCache() { try { const d = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null'); return d && Array.isArray(d.registros) ? d : null; } catch (e) { return null; } }
+function guardarCache(d) { try { localStorage.setItem(CACHE_KEY, JSON.stringify({ registros: d.registros, fotos: d.fotos || [], servidor: d.servidor || '', guardado: Date.now() })); } catch (e) { /* sin espacio: se omite */ } }
+
+async function pedirNube(query, init, ms) {
+  const ctrl = typeof AbortController === 'function' ? new AbortController() : null;
+  const t = ctrl ? setTimeout(() => ctrl.abort(), ms) : null;
+  let r;
+  try { r = await fetch(NUBE_URL + (query || ''), Object.assign({ signal: ctrl ? ctrl.signal : undefined }, init || {})); }
+  catch (e) { throw Object.assign(new Error(e && e.name === 'AbortError' ? 'La hoja tardó demasiado en responder' : 'Sin conexión'), { red: true }); }
+  finally { if (t) clearTimeout(t); }
+  if (!r.ok) throw Object.assign(new Error('La hoja respondió con error ' + r.status), { red: r.status >= 500 || r.status === 429 });
+  try { return await r.json(); } catch (e) { throw Object.assign(new Error('Respuesta inválida de la hoja'), { red: true }); }
+}
+const nubeGet = q => pedirNube(q, null, 30000);
+async function nubePost(cuerpo, ms) {
+  const d = await pedirNube('', { method: 'POST', body: JSON.stringify(cuerpo) }, ms || 60000);
+  if (!d || !d.ok) {
+    if (d && d.codigo === 'PIN') throw Object.assign(new Error('PIN incorrecto'), { pin: true });
+    if (d && d.codigo === 'BLOQUEADO') throw Object.assign(new Error(d.error || 'Demasiados intentos con PIN incorrecto. Espera 10 minutos.'), { bloqueado: true });
+    throw new Error((d && d.error) || 'La hoja no aceptó el cambio');
   }
-  if (!fuente || fuente.indexOf('id="seed-data"') < 0) fuente = PRISTINE.replace(/<html([^>]*?)\sdata-theme="[^"]*"/, '<html$1');
-  const registros = S.records.map(r => {
-    const o = plano(r);
-    o.mec1 = r._p[0] ? REG.nombre(r._p[0].k) : '';
-    o.mec2 = r._p[1] ? REG.nombre(r._p[1].k) : '';
-    delete o.creado; delete o.editado;
-    return o;
-  });
-  const fotos = [];
-  if (conFotos) {
-    for (const [rid, lista] of S.fotosBy) {
-      if (!S.porId.has(rid)) continue;
-      for (const f of lista) {
-        let data = f.src;
-        if (!data) { const c = await comprimir(f.blob, 1280, 0.74); data = await blobADataURL(c.blob); }
-        fotos.push({ id: f.id, registroId: rid, tipo: f.tipo, creado: f.creado || '', data });
-      }
+  return d;
+}
+
+/* Lo que está en la hoja pasa a ser la base; lo pendiente de este equipo se monta encima. */
+function aplicarDatosNube(d, origen) {
+  const regs = Array.isArray(d.registros) ? d.registros : [];
+  const fotos = Array.isArray(d.fotos) ? d.fotos : [];
+  S.nubeIds = new Set(regs.filter(r => r && r.id).map(r => String(r.id)));
+  S.seed = {
+    registros: regs.filter(r => r && r.id && !esSi(r.eliminado)).map(limpia).filter(r => r.fecha && r.unidad),
+    fotos: fotos.filter(f => f && f.id && f.registroId && f.driveId && !esSi(f.eliminado)).map(f => {
+      const id = String(f.id), reciente = S.fotosRecientes.get(id);
+      return { id, registroId: String(f.registroId), tipo: FOTO_TIPOS.includes(f.tipo) ? f.tipo : 'Otra', creado: String(f.creado || ''), driveId: String(f.driveId),
+        src: reciente || urlMiniatura(f.driveId, 1600), mini: reciente || urlMiniatura(f.driveId, 480) };
+    }),
+    generado: String(d.servidor || ''),
+    origen,
+  };
+}
+function fusionarEnSemilla(regs) {
+  const porId = new Map(S.seed.registros.map(r => [r.id, r]));
+  for (const r of regs) {
+    const id = String(r.id);
+    S.nubeIds.add(id); S.subidos.add(id);
+    if (r._deleted) porId.delete(id);
+    else { const o = limpia(r); if (o.fecha && o.unidad) porId.set(o.id, o); }
+  }
+  S.seed.registros = [...porId.values()];
+}
+
+async function cargarNube(op) {
+  op = op || {};
+  if (Nube.cargandoP) return Nube.cargandoP;
+  Nube.ultimoIntento = Date.now();
+  const gen = Nube.gen;
+  Nube.cargandoP = (async () => {
+    let d;
+    try {
+      d = await nubeGet('?accion=listar&_=' + Date.now());
+      if (!d || !d.ok || !Array.isArray(d.registros)) throw new Error((d && d.error) || 'Respuesta inválida de la hoja');
+    } catch (e) {
+      console.warn('No se pudo leer la hoja', e);
+      Nube.estado = e && e.red ? 'sin_conexion' : 'error';
+      Nube.error = (e && e.message) || '';
+      actualizarMeta();
+      if (op.avisar) toast('No se pudo conectar con la hoja de Google. Revisa tu conexión.');
+      return false;
     }
+    /* Si mientras se leía se subió algo desde aquí, esta lectura ya está vieja: se vuelve a leer. */
+    if (gen !== Nube.gen) { Nube.releer = true; return true; }
+    Nube.estado = 'ok'; Nube.error = ''; Nube.ultima = Date.now();
+    guardarCache(d);
+    const firma = JSON.stringify([d.registros, d.fotos]);
+    if (firma !== Nube.firma || S.seed.origen !== 'nube') {
+      Nube.firma = firma;
+      aplicarDatosNube(d, 'nube');
+      reconstruir();
+      await reconciliar();
+      renderFiltros(); renderTodo();
+    }
+    actualizarMeta();
+    if (op.avisar) toast('Datos al día con la hoja de Google');
+    return true;
+  })();
+  let res;
+  try { res = await Nube.cargandoP; } finally { Nube.cargandoP = null; }
+  if (Nube.releer) { Nube.releer = false; return cargarNube(op); }
+  return res;
+}
+
+/* Sube a la hoja todo lo que quedó guardado en este equipo (también lo que se registró antes de este cambio). */
+async function subirPendientes(op) {
+  op = op || {};
+  if (Nube.subiendo) { Nube.otraVez = true; return; }
+  const pendR = [...S.local.values()];
+  const pendF = [...S.fotosLocal.values()];
+  if (!pendR.length && !pendF.length) { Nube.faltaPin = false; actualizarMeta(); return; }
+  const pin = leerPin();
+  if (!pin) {
+    Nube.faltaPin = true; actualizarMeta();
+    if (op.pedirPin && !S.ui.pinPospuesto) Pin.pedir();
+    return;
   }
-  const json = JSON.stringify({ version: 1, generado: hoyISO(), registros, fotos }).replace(/</g, '\\u003c');
-  const re = /(<script[^>]*id="seed-data"[^>]*>)([\s\S]*?)(<\/script>)/;
-  if (!re.test(fuente)) throw new Error('No encontré el bloque de datos dentro de la página.');
-  let salida = fuente.replace(re, (m0, a, b, c) => a + json + c);
-  if (salida.trimStart().slice(0, 4) !== '<!--') salida = AVISO_TEXTO + salida;
-  descargar(new Blob([salida], { type: 'text/html;charset=utf-8' }), 'index.html');
+  Nube.faltaPin = false; Nube.subiendo = true; actualizarMeta();
+  let hubo = false, fallo = null;
+  try {
+    if (pendR.length) {
+      const ahora = new Date().toISOString();
+      const envio = pendR.map(r => (r._deleted ? { id: r.id, eliminado: true, editado: r.editado || ahora } : Object.assign(plano(r), { eliminado: false })));
+      const res = await nubePost({ accion: 'guardar', pin, registros: envio }, 90000);
+      Nube.gen++;
+      const resultado = new Map((res.resultado || []).map(x => [String(x.id), x]));
+      const listos = [], ganoOtro = [];
+      for (const r of pendR) {
+        const x = resultado.get(r.id);
+        if (!x || S.local.get(r.id) !== r) continue; /* sin respuesta, o se volvió a editar mientras subía */
+        listos.push(r);
+        if (x.estado === 'conservado' && x.registro) ganoOtro.push(x.registro);
+      }
+      await Store.quitar('registros', listos.map(r => r.id));
+      listos.forEach(r => S.local.delete(r.id));
+      const otros = new Set(ganoOtro.map(g => String(g.id)));
+      fusionarEnSemilla(listos.filter(r => !otros.has(r.id)));
+      if (ganoOtro.length) {
+        fusionarEnSemilla(ganoOtro.map(g => (esSi(g.eliminado) ? { id: String(g.id), _deleted: true } : g)));
+        toast(ganoOtro.length === 1 ? 'Alguien más cambió esa asistencia al mismo tiempo; quedó su versión.' : ganoOtro.length + ' asistencias las cambió alguien más al mismo tiempo; quedó su versión.');
+      }
+      if (listos.length) hubo = true;
+    }
+    for (const f of pendF) {
+      if (S.fotosLocal.get(f.id) !== f) continue;
+      if (f._deleted) {
+        await nubePost({ accion: 'borrarFoto', pin, id: f.id });
+        Nube.gen++;
+        S.seed.fotos = S.seed.fotos.filter(x => x.id !== f.id);
+      } else if (f.blob) {
+        const data = await blobADataURL(f.blob);
+        const res = await nubePost({ accion: 'foto', pin, foto: { id: f.id, registroId: f.registroId, tipo: f.tipo, nombre: f.nombre || '', mime: f.blob.type || 'image/jpeg', creado: f.creado || '', w: f.w || '', h: f.h || '', data } }, 180000);
+        Nube.gen++;
+        const url = srcFoto(f);
+        S.fotosRecientes.set(f.id, url);
+        const driveId = res.foto && res.foto.driveId ? String(res.foto.driveId) : '';
+        if (driveId && !S.seed.fotos.some(x => x.id === f.id)) S.seed.fotos.push({ id: f.id, registroId: f.registroId, tipo: f.tipo, creado: f.creado || '', driveId, src: url, mini: url });
+      } else continue;
+      await Store.quitar('fotos', f.id);
+      S.fotosLocal.delete(f.id);
+      hubo = true;
+    }
+    Nube.reintentos = 0;
+  } catch (e) {
+    fallo = e;
+    console.warn('No se pudo subir a la hoja', e);
+    if (e && e.pin) { guardarPin(''); Nube.faltaPin = true; }
+    else { Nube.estado = e && e.red ? 'sin_conexion' : 'error'; Nube.error = (e && e.message) || ''; }
+  } finally {
+    Nube.subiendo = false;
+  }
+  if (hubo) { reconstruir(); renderFiltros(); renderTodo(); }
+  actualizarMeta();
+  if (fallo && fallo.pin) Pin.pedir('El PIN guardado en este equipo ya no es válido. Escríbelo de nuevo.');
+  else if (fallo && fallo.bloqueado) toast(fallo.message);
+  else if (fallo) programarReintento();
+  if (hubo && !fallo) await cargarNube();
+  if (Nube.otraVez) { Nube.otraVez = false; programarSync(300); }
+}
+let syncT = null, reintentoT = null;
+function programarSync(ms) {
+  clearTimeout(syncT);
+  syncT = setTimeout(() => { subirPendientes({ pedirPin: true }); }, ms == null ? 600 : ms);
+}
+function programarReintento() {
+  clearTimeout(reintentoT);
+  Nube.reintentos++;
+  reintentoT = setTimeout(() => { subirPendientes(); }, Math.min(300000, 15000 * Math.pow(2, Nube.reintentos - 1)));
+}
+async function sincronizarAhora() {
+  if (Nube.subiendo) { toast('Ya se está subiendo a la hoja…'); return; }
+  if (S.local.size || S.fotosLocal.size) {
+    if (!leerPin()) { Pin.pedir(); return; }
+    clearTimeout(reintentoT); Nube.reintentos = 0;
+    await subirPendientes();
+    toast(S.local.size || S.fotosLocal.size ? 'Todavía no se pudo subir. Se reintenta solo.' : 'Todo quedó en la hoja de Google');
+  } else await cargarNube({ avisar: true });
+}
+function pintarSync() {
+  const b = $('#meta-local'), t = $('#meta-sync');
+  const nR = S.local.size, nF = S.fotosLocal.size, pend = nR + nF;
+  const que = [nR ? nR + ' ' + plural(nR, 'cambio') : '', nF ? nF + ' ' + plural(nF, 'foto') : ''].filter(Boolean).join(' y ');
+  let estado, texto, ayuda = '';
+  if (Nube.subiendo) { estado = 'subiendo'; texto = 'Subiendo ' + que + ' a la hoja…'; }
+  else if (pend && Nube.faltaPin) { estado = 'pin'; texto = que + ' sin subir · falta el PIN'; ayuda = 'Toca para escribir el PIN'; }
+  else if (pend && (Nube.estado === 'sin_conexion' || Nube.estado === 'error')) { estado = 'pendiente'; texto = que + ' sin subir · sin conexión'; ayuda = 'Se reintenta solo. Toca para intentar ahora'; }
+  else if (pend) { estado = 'subiendo'; texto = que + ' por subir…'; }
+  else if (Nube.estado === 'cargando') { estado = 'cargando'; texto = 'Conectando con la hoja…'; }
+  else if (Nube.estado === 'ok') { estado = 'ok'; texto = 'Al día con la hoja de Google · ' + momento(Nube.ultima); ayuda = 'Toca para actualizar ahora'; }
+  else { estado = 'error'; texto = Nube.ultima ? 'Sin conexión · datos de las ' + momento(Nube.ultima) : 'Sin conexión con la hoja'; ayuda = 'Toca para reintentar'; }
+  b.hidden = false;
+  b.dataset.estado = estado;
+  t.textContent = texto;
+  b.title = ayuda;
+  b.setAttribute('aria-label', texto + (ayuda ? '. ' + ayuda : ''));
+}
+const Pin = (() => {
+  const dlg = $('#dlg-pin'), form = $('#pin-form'), inp = $('#pin-in'), err = $('#pin-err'), txtP = $('#pin-texto'), quitar = $('#pin-quitar'), ok = $('#pin-ok');
+  let abierto = false;
+  const abrirDlg = () => { if (typeof dlg.showModal === 'function') dlg.showModal(); else dlg.setAttribute('open', ''); };
+  const cerrarDlg = () => { if (typeof dlg.close === 'function') { if (dlg.open) dlg.close(); } else dlg.removeAttribute('open'); abierto = false; };
+  function error(m) { err.textContent = m; err.hidden = false; inp.setAttribute('aria-invalid', 'true'); inp.focus(); inp.select(); }
+  function pedir(msg) {
+    if (abierto) return;
+    const hay = !!leerPin();
+    txtP.textContent = msg || (hay ? 'Este equipo ya tiene el PIN guardado. Si cambió, escribe el nuevo.' : 'Para subir asistencias a la hoja de Google escribe el PIN. Se pide una sola vez en este equipo.');
+    quitar.hidden = !hay;
+    inp.value = ''; err.hidden = true; inp.removeAttribute('aria-invalid');
+    ok.disabled = false; ok.textContent = 'Guardar PIN';
+    abierto = true;
+    abrirDlg();
+    setTimeout(() => inp.focus(), 40);
+  }
+  function init() {
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      const pin = inp.value.trim();
+      if (!pin) { error('Escribe el PIN.'); return; }
+      ok.disabled = true; ok.textContent = 'Revisando…';
+      try { await nubePost({ accion: 'verificarPin', pin }, 30000); }
+      catch (er) {
+        ok.disabled = false; ok.textContent = 'Guardar PIN';
+        error(er && er.pin ? 'Ese PIN no es correcto.' : er && er.bloqueado ? er.message : 'No hay conexión con la hoja. Intenta de nuevo.');
+        return;
+      }
+      guardarPin(pin); Nube.faltaPin = false; S.ui.pinPospuesto = false;
+      cerrarDlg();
+      toast('PIN guardado en este equipo');
+      actualizarMeta();
+      clearTimeout(reintentoT); Nube.reintentos = 0;
+      subirPendientes();
+    });
+    $('#pin-luego').addEventListener('click', () => { S.ui.pinPospuesto = true; cerrarDlg(); actualizarMeta(); });
+    quitar.addEventListener('click', () => { guardarPin(''); cerrarDlg(); Nube.faltaPin = !!(S.local.size || S.fotosLocal.size); actualizarMeta(); toast('Se quitó el PIN de este equipo'); });
+    dlg.addEventListener('cancel', () => { S.ui.pinPospuesto = true; });
+    dlg.addEventListener('close', () => { abierto = false; });
+  }
+  return { pedir, init, get abierto() { return abierto; } };
+})();
+function iniciarSync() {
+  $('#meta-local').addEventListener('click', () => { if ($('#meta-local').dataset.estado === 'pin') { S.ui.pinPospuesto = false; Pin.pedir(); } else sincronizarAhora(); });
+  cargarNube().then(() => subirPendientes({ pedirPin: true }));
+  setInterval(() => {
+    if (document.visibilityState !== 'visible' || Nube.subiendo || Nube.cargandoP) return;
+    if (Date.now() - Nube.ultimoIntento >= 90000) cargarNube();
+  }, 15000);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && Date.now() - Nube.ultimoIntento > 20000) cargarNube().then(() => subirPendientes());
+  });
+  window.addEventListener('online', () => { clearTimeout(reintentoT); Nube.reintentos = 0; subirPendientes(); cargarNube(); });
 }
 
 /* ================= Arranque ================= */
@@ -2282,7 +2562,9 @@ function initMenu() {
     exportar: () => exportarExcel().catch(errXLSX),
     respaldo: () => descargarRespaldo().catch(e => { console.error(e); toast('No se pudo crear el respaldo.'); }),
     restaurar: () => { const i = $('#in-respaldo'); i.value = ''; i.click(); },
-    publicar: () => abrirPublicar(),
+    sincronizar: () => sincronizarAhora(),
+    hoja: () => { const a = h('a', { href: HOJA_URL, target: '_blank', rel: 'noopener', style: 'display:none' }); document.body.append(a); a.click(); a.remove(); },
+    pin: () => { S.ui.pinPospuesto = false; Pin.pedir(); },
   };
   menu.addEventListener('click', e => { const b = e.target.closest('button[data-accion]'); if (!b) return; cerrar(); acciones[b.dataset.accion](); });
   $('#in-excel').addEventListener('change', e => { const f = e.target.files && e.target.files[0]; if (f) importarExcel(f).catch(errXLSX); });
@@ -2360,6 +2642,9 @@ function initEventos() {
 }
 async function init() {
   S.seed = leerSemilla();
+  S.seed.origen = 'pagina';
+  const copia = leerCache();
+  if (copia) { aplicarDatosNube(copia, 'cache'); Nube.ultima = Number(copia.guardado) || 0; }
   S.persistente = await Store.init();
   try {
     for (const r of await Store.todos('registros')) { if (r && r.id) S.local.set(String(r.id), r._deleted ? { id: String(r.id), _deleted: true } : limpia(r)); }
@@ -2369,12 +2654,13 @@ async function init() {
   await reconciliar();
   if (!S.persistente) {
     $('#banner').hidden = false;
-    $('#banner-txt').textContent = 'Este navegador no permite guardar datos (modo privado o almacenamiento bloqueado). Puedes usar el tablero, pero lo que agregues se perderá al cerrar la página.';
+    $('#banner-txt').textContent = 'Este navegador no permite guardar datos (modo privado o almacenamiento bloqueado). Lo que registres se sube a la hoja de Google si hay conexión; sin conexión se perdería al cerrar la página.';
   }
   const llaves = cont => { for (const e of ESTADOS) cont.append(h('li', { class: e.cls }, h('i', { 'aria-hidden': 'true' }), e.label)); };
   llaves($('#mec-keys')); llaves($('#dias-keys'));
-  initTema(); initMenu(); initEventos();
+  initTema(); initMenu(); initEventos(); Pin.init();
   renderFiltros(); renderTodo(); actualizarMeta();
+  iniciarSync();
 }
 init().catch(e => {
   console.error(e);
